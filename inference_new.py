@@ -10,6 +10,8 @@ from torchvision import models
 import pickle
 from collections import deque
 
+
+
 # Func para ajudar a achar a imagem p/ deteccao
 def get_iou(boxA, boxB):
     
@@ -58,6 +60,12 @@ tf_classify = A.Compose([
 ])
 
 cap = cv2.VideoCapture(0)
+frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+fps = 30
+
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+out_left = cv2.VideoWriter('Inferencia_Rangers.mp4', fourcc, fps, (frame_width, frame_height))
 if not cap.isOpened():
     print("Error: Could not open webcam.")
     exit()
@@ -157,7 +165,8 @@ while True:
         cv2.rectangle(frame, (x1, y1 - text_height - 10), (x1 + text_width, y1), color, -1)
         cv2.putText(frame, text, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
 
-    cv2.imshow("Hospital Waste Detection", frame)
+    cv2.imshow("Hospital Waste Detection - Rangers", frame)
+    out_left.write(frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
