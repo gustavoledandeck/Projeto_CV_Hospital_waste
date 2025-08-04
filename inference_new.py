@@ -10,13 +10,9 @@ from torchvision import models
 import pickle
 from collections import deque
 
-# --- Helper Function for IOU Calculation ---
+# Func para ajudar a achar a imagem p/ deteccao
 def get_iou(boxA, boxB):
-    """
-    Calculate the Intersection over Union (IoU) of two bounding boxes.
-    This is used to determine if a detection in a new frame corresponds
-    to an object we are already tracking.
-    """
+    
     xA = max(boxA[0], boxB[0])
     yA = max(boxA[1], boxB[1])
     xB = min(boxA[2], boxB[2])
@@ -61,16 +57,14 @@ tf_classify = A.Compose([
     ToTensorV2()
 ])
 
-# --- Real-time Detection and Classification ---
 cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     print("Error: Could not open webcam.")
     exit()
 
-# --- NEW: Tracking and Smoothing Variables ---
-# This list will store our stable, tracked objects.
+
 tracked_objects = []
-# A unique ID for each new object we track.
+
 next_object_id = 0
 
 while True:
@@ -78,7 +72,7 @@ while True:
     if not ok:
         break
 
-    # --- Object Detection using Contours ---
+    # Deteccao usa parte do lab, com blur e canny, acrescentando a findContours que é nova
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (7, 7), 0)
     edged = cv2.Canny(blurred, 30, 150)
@@ -106,23 +100,20 @@ while True:
                 best_iou = iou
                 best_match_idx = i
         
-        # If a good match is found, update the tracked object
-        if best_iou > 0.4: # IOA threshold for matching
+        
+        if best_iou > 0.4: 
             matched_box = current_detections[best_match_idx]
-            # Smooth the bounding box position
+            
             obj['box'] = (np.array(obj['box']) * 0.8 + np.array(matched_box) * 0.2).astype(int)
             obj['unseen_frames'] = 0
             obj['matched'] = True
             unmatched_detections.remove(best_match_idx)
 
-    # --- Update tracking list ---
-    # Remove objects that haven't been seen for a while
-    tracked_objects = [obj for obj in tracked_objects if obj['unseen_frames'] < 10]
+    tracked_objects = [obj for obj in tracked_objects if obj['unseen_frames'] < 10]  ###-->> pra tirar obj/diminuir spam
     for obj in tracked_objects:
         if not obj['matched']:
             obj['unseen_frames'] += 1
 
-    # Add new, unmatched detections as new tracked objects
     for i in unmatched_detections:
         box = current_detections[i]
         x1, y1, x2, y2 = box
@@ -138,7 +129,7 @@ while True:
             probabilities = F.softmax(out, dim=1)
             conf, idx = torch.max(probabilities, 1)
             
-            # Only add new objects if confidence is high
+            #valor para manter o objeto detecto, só muda caso tenha detectado outro no cena > 0.7
             if conf.item() > 0.7:
                 label = classes[idx.item()]
                 tracked_objects.append({
@@ -151,7 +142,7 @@ while True:
                 })
                 next_object_id += 1
 
-    # --- Display the final, tracked objects ---
+    #Display da box
     for obj in tracked_objects:
         x1, y1, x2, y2 = obj['box']
         label = obj['label']
