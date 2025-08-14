@@ -20,7 +20,7 @@ data_dir = "data/processed"  # --->>> aqui dataset ja tratado pelo prepare
 
 num_classes = 4
 
-num_epochs = 100 
+num_epochs = 15 
 
 learning_rate = 0.001
 
@@ -58,8 +58,8 @@ tf_train = A.Compose([
     
     A.ShiftScaleRotate(shift_limit=0.05, scale_limit=0.1, rotate_limit=45, p=0.8),
     
-    # This simulates viewing the object from different perspectives, which is
-    # very important for handling changes in camera angle.
+    # Ajuda na captura de  angulos diferentes
+
     A.Perspective(scale=(0.05, 0.1), p=0.7),      #---> daqui em diante serve para ajudar o modelo
                                                   #     a classificar mesmo que de angulo diferente da foto
     # --- Existing Augmentations ---

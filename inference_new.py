@@ -164,7 +164,8 @@ while True:
         (text_width, text_height), _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)
         cv2.rectangle(frame, (x1, y1 - text_height - 10), (x1 + text_width, y1), color, -1)
         cv2.putText(frame, text, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
-
+	
+    #cv2.imshow("Hospital Waste Detection", frame)
     cv2.imshow("Hospital Waste Detection - Rangers", frame)
     out_left.write(frame)
 
@@ -172,5 +173,6 @@ while True:
         break
 
 cap.release()
+out_left.release()
 cv2.destroyAllWindows()
 
