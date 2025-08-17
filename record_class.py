@@ -21,7 +21,7 @@ while True:
     cv2.imshow("capture", frame)
     key = cv2.waitKey(1) & 0xFF
     if key == ord(' '):
-        fname = SAVE_DIR / f"{CLASS}_{count:03d}.jpg"
+        fname = SAVE_DIR / f"{CLASS}_{count:03d}__.jpg"
         cv2.imwrite(str(fname), frame)
         print(f"Saved {fname}")
         count += 1
